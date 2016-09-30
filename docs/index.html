@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BABAM User Guide</title>
+<link rel="stylesheet" type="text/css" charset="utf-8" media="all" 
+href="styles/common.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" 
+href="styles/screen.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="print" 
+href="styles/print.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" 
+media="projection" href="styles/projection.css">
+
+<style type="text/css">
+strong.regular-font {
+  font-family: Arial, Lucida Grande, sans-serif;
+  font-style: italic;
+  font-size: 0.9em;
+}
+</style>
+
+</head>
+
+<body>
+<h1><a href="index.html">BABAM</a> User Guide</h1>
+
+<p>The Browsable Atlas of Behavior-Anatomy Maps (BABAM) is a Graphical User Interface for exploring hypotheses of correlations between neural activity in regions of the brain and behavior for <i>Drosophila melanogaster</i>. These correlation hypotheses are the result of our thermogenetic neural activation screen of 2,205 lines from the Janelia GAL4 collection. More information on this data can be found <a href="http://research.janelia.org/bransonlab/FlyBowl/BehaviorResults/index.html">here</a>. </p>
+
+<hr class="h2-divider">
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#Download">Download</a></li>
+<li><a href="#Startup">Start-up</a></li>
+<li><a href="#DataLocs">Specifying Data Locations</a></li>
+<li><a href="#CreateMap">Creating a Behavior-Anatomy Map</a>
+<ul>
+<li><a href="#SpecifyBehavior">Specifying behavior statistics</a></li>
+<li><a href="#BehaviorIndex">Behavior-Index Computation</a></li>
+<li><a href="#BehaviorAnatomyCorrelation">Behavior-Anatomy Correlation Hypothesis Test</a></li>
+</ul>
+</li>
+<li><a href="#ExploreMap">Exploring a Behavior-Anatomy Map</a>
+<ul>
+<li><a href="#ViewMode">Viewing Mode</a></li>
+<li><a href="#PValueColormap">P-value Colormap</a></li>
+<li><a href="#SupervoxelInfo">Current Supervoxel Information Panel</a></li>
+</ul>
+</li>
+<li><a href="#ExploreSupervoxel">Exploring a Supervoxel</a>
+<ul>
+<li><a href="#ShowImportantLines">Show important lines</a></li>
+<li><a href="#ShowANotBLines">Show lines with expression but not behavior</a></li>
+<li><a href="#MapExpressionCorrelation">Map expression correlation</a></li>
+<li><a href="#ShowLinesWithExpression">Show lines with expression</a></li>
+<li><a href="#ShowLinesWebpage">Line-Information Webpage</a></li>
+</li>
+</ul>
+<li><a href="#ClusterMap">Clustering a Behavior-Anatomy Map</a></li>
+<li><a href="#ShowCorrelatedBehaviors">Showing Correlated Behaviors</a></li>
+<li><a href="#ExportingResults">Exporting Results</a></li>
+<li><a href="#Parameters">Parameters</a></li>
+<li><a href="#FindSupervoxel">Finding a Supervoxel</a></li>
+</ul>
+
+<!--
+<li><a href="#Itinerary">Suggested Itinerary</a></li>
+<li><a href="#DemoVideo">Video Tutorial</a></li>
+<li><a href="#SampleData">Sample Data</a></li>
+-->
+</ul>
+
+<hr class="h2-divider">
+
+<h2><a id="Download">Download</a></h2>
+
+<b>TODO</b>: This section will be filled in when we have a home for BABAM. 
+
+<hr class="h2-divider">
+
+<h2><a id="Startup">Start-up</a></h2>
+
+BABAM is a MATLAB-based program. To run it:
+<ol>
+<li> Start MATLAB. </li>
+<li> Within MATLAB, change into the directory <b>FlyBowlAnalysis</b>:
+<pre>cd FlyBowlAnalysis;</pre>
+</li>
+<li> Run <b>StartBABAM</b> on the command line to start BABAM:
+<pre>StartBABAM;</pre>
+</li>
+</ol>
+
+<hr class="h2-divider">
+
+<h2><a id="DataLocs">Specifying Data Locations</a></h2>
+
+BABAM will then try to locate the Fly Bowl behavior and expression data it needs. These values are memorized in the file .BABAM_rc.mat, so once they are entered, they will not need to be entered the next time you run BABAM. You can change the locations of any of the data within the GUI under the <b>Edit -> Data locations</b> menu item. BABAM needs to know the location of the following:
+<ol>
+<li> <a href="images/ScreenShot_SelectBehaviorDataMATFile.png"><b>Behavior Data MAT File</b></a>: MAT file containing the behavior screen results. This data can be downloaded at <a href="http://research.janelia.org/bransonlab/FlyBowl/BABAMMATFiles/current/BehaviorData.mat">BehaviorData.mat</a>. <br>
+</li>
+<li> <a href="images/ScreenShot_SelectSupervoxelDataMATFile.png"><b>Supervoxel Clustering Data MAT File</b></a>: MAT file containing the supervoxel clustering of the brain. This data can be downloaded at <a href="http://research.janelia.org/bransonlab/FlyBowl/BABAMMATFiles/current/SupervoxelClusteringData.mat">SupervoxelClusteringData.mat</a>. <br>
+</li>
+<li> <a href="images/ScreenShot_SelectAnatomyDir.png"><b>Per-line Anatomy Image Directory</b></a>: Directory containing normalized, registered images of the expression patterns for each brain. This data can be downloaded at <a href="TODO">AverageAnatomyData</a>.<br>
+</li>
+</ol>
+
+<hr class="h2-divider">
+
+<h2><a id="CreateMap">Creating a Behavior-Anatomy Map</a></h2>
+
+Immediately after starting the GUI, the main axes will be blank. To create and show a behavior-anatomy map, use the <b>Map Behavior</b> panel in the bottom-left of the GUI. 
+<ol>
+<li><a href="#SpecifyBehavior">Specify a (combination of) behavior statistic(s)</a> by:
+<ul>
+<li><a href="#BasicMode"><b>Basic mode</b></a>: using the drop-down menus.</li>
+<li><a href="#AdvancedMode"><b>Advanced mode</b></a>, specifying a logical expression in the text edit box.</li> 
+</ul>
+<li>Click the purple <b>Update</b> button to perform a statistical test of the significance of the correlation between the specified behavior statistic and the expression level in each supervoxel across all GAL4 lines. </li>
+<li>The GUI updates the main plot to show the regions of the brain significantly correlated with the specified behavior statistic. Each supervoxel is colored by its p-value.</li>
+</ol>
+
+<h3><a id="SpecifyBehavior">Specifying behavior statistics</a></h3>
+<p>Specify the behavior statistics to map using the <b>Map Behavior</b> panel. </p>
+<p>In <a id="BasicMode"><b>Basic mode</b></a> (<i>Advanced mode</i> not checked), you can specify the behavior statistics using the drop-down menus. Specify the first behavior statistic (e.g. <i>backup</i>) and whether to look for higher-than-control (<i>More</i>) or lower-than-control (<i>Less</i>) values for that statistic with the top row of drop-down menus. Using the bottom-left drop-down, select <i>None</i> if you want to map a single behavior statistic. Otherwise, select a logical operator (<i>AND</i>, <i>OR</i>, or <i>AND NOT</i>) to use when combining behavior statistics. Use the bottom row of drop-down menus to select the second behavior. </p>
+<center>
+<a href="images/ScreenShot_SpecifyBehaviorStatistics.png"><img src="images/ScreenShot_SpecifyBehaviorStatistics.png" width="500px"></a>
+</center>
+<p>In <a id="AdvancedMode"><b>Advanced mode</b></a>, you can specify a logical combination of any number of behavior statistics using the text edit menu. For example:
+<pre>
+{backup_plus} AND NOT {jump_plus} AND NOT {stop_minus}
+</pre>
+Specify behavior statistic tests in {braces}, combining a behavior statistic name (e.g. <i>backup</i>) and whether to test for a higher-than-control (<i>plus</i>) or lower-than-control (<i>minus</i>) value for that statistic. Behavior statistics specified in the above example: <i>{backup_plus}</i>, <i>{jump_plus}</i>, and <i>{stop_minus}</i>. Combine these with the logical operators <i>AND</i>, <i>OR</i>, or <i>AND NOT</i>. 
+</p>
+<center>
+<a href="images/ScreenShot_SpecifyBehaviorStatistics.png"><img src="images/ScreenShot_SpecifyBehaviorStatistics_Advanced.png" width="500px"></a>
+</center>
+
+<a id="BehaviorIndex"><h3>Behavior-Index Computation</h3></a>
+
+<p>The behavior index computed for a given GAL4 line, based on the <a href="#CreateMap">logical expression</a> specified, is a number between 0 and 1. For example, a value of 1 for <i>Backup More</i> indicates that the given GAL4 line performs more back-ups than control, a value of 0 indicates that the given GAL4 line does not perform more back-ups than control, and intermediate values indicate confidence. The behavior index is a thresholded and normalized version of the measured value for the behavior statistic. To logically combine multiple behavior statistics, we interpret these behavior indices as probabilities. Under this interpretation, ANDs correpond to multiplication, ORs to addition, and NOTs to the complement (1-x). Details of the computation are provided <a href="TODO">here</a>. </p>
+
+<a id="BehaviorAnatomyCorrelation"><h3>Behavior-Anatomy Correlation Hypothesis Test</h3></a>
+
+<p>For the specified behavior statistic, and for each supervoxel subregion of the brain, we compute the correlation &rho; between estimates of whether the supervoxel has expression and whether the behavior statistic has a high (or low) value, across all GAL4 lines. We use a bootstrapping method to compute how unexpectedly high this measured correlation is given the null hypothesis that there is no correlation between behavior and anatomy, which we estimate by shuffling the lines. The larger the number of shuffled samples, the more precise this p-value estimate will be, but the longer it will take. The number of samples can be specified in the GUI <a href="#Parameters">parameters</a>.</p>
+
+<p>To create a single map, a hypothesis test for positive correlation is performed for each of the 7,065 supervoxels. We suppress (by setting the reported p-value to 1) all correlations with a <a href="https://en.wikipedia.org/wiki/False_discovery_rate">Benjamini-Hochberg false discovery rate</a> (FDR) greater than 0.25. The FDR threshold can be specified in the GUI <a href="#Parameters">parameters</a>.</p>
+
+<hr class="h2-divider">
+
+<h2><a id="ExploreMap">Exploring a Behavior-Anatomy Map</a></h2>
+
+<p>The behavior-anatomy map is shown in the main plot axes. </p>
+<center>
+<a href="images/ScreenshotMainWindow.png"><img width="500px" src="images/ScreenshotMainWindow.png"></a>
+</center>
+
+<h3><a id="ViewMode">Viewing Mode</a></h3>
+
+Initially, the maximum projection over the z-axis is shown (well, really minimum projection, as small p-values are more significant). The viewing mode can be changed under the <b>View</b> menu. Options:
+<ul>
+<li><i>Max-Z-Projection</i>: Minimum p-value over all z-slices.</li>
+<li><i>Z-Slice</i>: Single z-slice of the map. The z-slice shown can be changed using either the slider bar or text edit box to the right of the main axes. </li>
+<li><i>Z-slice max projection</i>: Minimum p-value over all z-slices in three segments (top: anterior, middle: mid, bottom: posterior) of the map. </li>
+<li><i>Max-Y-Projection</i>: Minimum p-value over all y-slices.</li>
+<li><i>Y-Slice</i>: Single y-slice of the map. The y-slice shown can be changed using either the slider bar or text edit box to the right of the main axes. </li>
+<li><i>Y-slice max projection</i>: Minimum p-value over all y-slices in three segments (top: dorsal, middle: mid, bottom: ventral) of the map.</li>
+</ul>
+
+<h3><a id="PValueColormap">P-value Colormap</a></h3>
+The jet colormap is used to display the significance of the correlation hypothesis tests, with red indicating high significance (small p-value), and blue to black indicating low significance (large p-value). By default, a log scale is used when choosing a color, thus the difference in color between .01 and .001 should be the same as the difference between .001 and .0001. Parameters of the colormap can be changed using the <b>P-value colormapping</b> section of the dialog from the <b><a href="#Parameters">Edit->Parameters...</a></b> menu item. These parameters are:
+<ul>
+<li><i>Colormap interpolation</i>: Whether to use a log scaling or a linear scaling of the p-values when selecting colors. </li>
+<li><i>Min. p-value</i>: All supervoxels with p-values at or below this value will be colored dark red.</li>
+<li><i>Max. p-value</i>: All supervoxels with p-values at or above this value will be colored black. Max. and min. p-values define the limits of the colormap.</li>
+</ul>
+
+<h3><a id="SupervoxelInfo">Current Supervoxel Information Panel</a></h3>
+
+The panel at the bottom-center of the GUI shows information about the supervoxel or cluster of supervoxels over which the mouse pointer is currently hovering. The following information is shown:
+<ul>
+<li><i>Supervoxel ID</i>: The numerical identifier of the current supervoxel. You can relocate a given supervoxel in the map using the <b>Edit -> Find supervoxel...</b> menu item. </li>
+<li><i>Compartment</i>: Abbreviated name of the compartment (as defined at in <a href="http://www.sciencedirect.com/science/article/pii/S2211124712002926#fig7">Jenett et al., <i>Cell Reports</i>, 2012, Figure 7</a>) which the supervoxel is contained. </li>
+<li><i>Corr. p-value</i>: Estimated significance of the hypothesis test that there is acorrelation between the selected behavior statistic and expression in the given supervoxel. </li>
+<li><i>(X,Y,Z)</i>: Location of the mouse pointer in the image stack. For max-projections, the Z-coordinate indicates which slice has the minimum p-value at this (X,Y) location. </li>
+</ul>
+
+<hr class="h2-divider">
+
+<h2><a id="ExploreSupervoxel">Exploring a Supervoxel</a></h2>
+
+<center>
+<a href="images/ScreenshotMainWindow_SupervoxelContextMenu.png"><img width="500px" src="images/ScreenshotMainWindow_SupervoxelContextMenu.png"></a>
+</center>
+Right-clicking on a supervoxel results in a menu with a list of ways of understanding the source of the correlation between the selected behavior and the clicked supervoxel. The menu has the following items, all of which are described in detail in the following sections:
+<ul>
+<li><a href="#SupervoxelInfo"><i>Supervoxel ??? in ??, p = ???????</i></a>: Information about which supervoxel was clicked. This is the same information shown in the <a href="#SupervoxelInfo">Current Supervoxel Information Panel</a>. </li>
+<li><a href="#ShowImportantLines"><i>Show important lines</i></a>: Generates a webpage and figures with information about the most important lines (those with both high values for the behavior index and expression) for producing the correlation between the selected behavior and supervoxel.</li>
+<li><a href="#ShowANotBLines"><i>Show lines with expression but not behavior</i></a>: Generates a webpage and figures with information about the with high expression in the selected supervoxel, but <i>low</i> values for the behavior index. These are lines for which expression in the selected supervoxel does <i>not</i> result in the selected behavior.</li>
+<li><a href="#MapExpressionCorrelation"><i>Map expression correlation</i></a>: Colors each supervoxel according to how correlated expression in that supervoxel is with expression in the selected supervoxel across all lines.</li>
+<li><a href="images/Screenshot_ShowOtherCorrelatedBehaviors.png"><i>Show other correlated behaviors</i></a>: Shows other behavior statistics that are correlated with expression in the selected supervoxel. These behavior statistics are sorted by p-value from most to least significant.</li>
+<li><a href="#ShowLinesWithExpression"><i>Show lines with expression</i></a>: Shows lines which have high expression in the selected supervoxel, regardless of their behavior index.</li>
+</ul>
+
+<h3><a id="ShowImportantLines">Show important lines</a></h3>
+
+<p>By selecting the <b>Show important lines</b> option from the <a href="#ExploreSupervoxel">supervoxel menu</a>, one can find and investigate GAL4 lines which both have expression in the selected supervoxel and have a high value for the selected behavior index. </p>
+
+<p>More specifically, it selects lines according to the product of their behavior and anatomy indices. It selects the first n lines whose totalled behavior-anatomy-product indices account for a set fraction  of the total behavior-anatomy-product indices across all lines. As reading in information about all these lines can be slow, we also limit the maximum number of lines shown to a fixed value. The number of lines selected can be controlled in the <b>Show important lines for a cluster/supervoxel</b> section of the dialog at the <b><a href="#Parameters">Edit->Parameters...</a></b> menu item:
+<ul>
+<li><i>Frac. behavior/anatomy index to explain</i>: Fraction of the totalled behavior-anatomy-product indices that should be accounted for by the selected lines.</li>
+<li><i>Max. num. lines to show</i>: Upper limit on the number of lines to show</li>
+</ul>
+</p>
+
+<p>The lines selected will be shown in three ways:
+<ol>
+<li> <a href="#ShowLinesWebpage"><i>Line-information webpage</i></a>: Information for these lines about the behavioral effects of activation and their neural expression patterns will be shown in a webpage generated on the fly in the user's <a href="http://www.mathworks.com/help/matlab/ref/tempdir.html">temporary directory</a>. More information available <a href="#ShowLinesWebpage">below</a>.</li>
+<li> <a href="images/RegisteredMaxProjImages.png"><i>Max-projection expression-pattern images</a></i>: The maximum-projection image of the expression patterns for each of the lines will be plotted in a figure. 
+</li>
+<li> <a href="images/MaskedRegisteredMaxProjImages.png"><i>Masked max-projection expression-pattern images</a></i>: We first compute the average image stack (in 3-d) over all the selected lines. This is shown in the <a href="images/MaskedRegisteredMaxProjImages.png">bottom right plot</a>. For each of the lines, we show the maximum projection of the expression pattern masked (multiplied) by this average image stack. Thus, this max-projection will focus on common regions of expression between the selected lines. The true image stacks for each line can either be read in from disk (<i>True</i>) or approximated from their low-dimensional supervoxel representation (<i>Supervoxel</i>). The user is queried for which type of data to use with the <a href="images/Screenshot_LineAverageType.png">Line average type</a> dialog. <i>True</i> is slower but more accurate, and requires access to the original registered and normalized image stacks, while <i>Supervoxel</i> is faster but less accurate.</li>
+</ol>
+
+<h3><a id="ShowANotBLines">Show lines with expression but not behavior</a></h3>
+
+<p>By selecting the <b>Show lines with expression but not behavior</b> option from the <a href="#ExploreSupervoxel">supervoxel menu</a>, one can find and investigate GAL4 lines which have expression in the selected supervoxel but do <i>not</i> have a high value for the selected behavior index. Here, lines are ordered and selected based on the product of <i>one minus the behavior index</i> and the anatomy index. We limit the lines shown based on the following parameters (accessed via the <a href="#Parameters"><b>Edit->Parameters...</b></a> dialog:
+<ul>
+<li><i>Num. lines to show</i>: Maximum number of lines to select.</li>
+<li><i>Min. anatomy index</i>: For lines selected, minimum expression level in the selected supervoxel.</li>
+<li><i>Max. behavior index</i>: For lines selected, maximum value of the current behavior index.</li>
+</ul>
+Other than this change in the lines selected, the same visualizations of these lines as described for <a href="#ShowImportantLines">Show important lines</a> will be shown.</p>
+
+<h3><a id="MapExpressionCorrelation">Map expression correlation</a></h3>
+
+<center>
+<a href="images/Screenshot_MapExpressionCorrelation.png"><img src="images/Screenshot_MapExpressionCorrelation.png" width="500px"></a>
+</center>
+
+<p>Suppose that activity in supervoxel i is correlated with a behavioral effect, and, genetically, expression in supervoxel j is correlated with expression in supervoxel i. Then, we would observe a correlation between expression in supervoxel j and the behavioral effect. To examine whether this could be the case, we can look at the correlation in expression between the selected supervoxel and all other supervoxels. Selecting the <b>Map expression correlation</b> option from the <a href="#ExploreSupervoxel">supervoxel menu</a> will result in coloring each supervoxel by the Pearson's correlation coefficient of its expression across our line collection between the selected supervoxel. Positive correlation is shown in red, negative correlation is shown in blue, and no correlation is shown as white. The selected supervoxel is outlined in black. To return to the behavior-anatomy correlation map, click the <b>X</b> box labeled <b>Showing correlation in expression to SV ??? in ??</b> at the bottom right of the GUI.</p>
+
+<h3><a id="ShowLinesWithExpression">Show lines with expression</a></h3>
+
+<p>By selecting the <b>Show lines with expression</b> option from the <a href="#ExploreSupervoxel">supervoxel menu</a>, one can find and investigate GAL4 lines which have expression in the selected supervoxel regardless of their behavior. Here, lines are ordered and selected based only on their expression. Other than this change in the lines selected, the same visualizations of these lines as described for <a href="#ShowImportantLines">Show important lines</a> will be shown.</p>
+
+
+<h3><a id="ShowLinesWebpage">Line-Information Webpage</a></h3>
+ 
+<center>
+<a href="images/Screenshot_ShowLinesWebpageAnnotated.png"><img src="images/Screenshot_ShowLinesWebpageAnnotated.png" width="500px"></a>
+</center>
+
+For each of the selected lines, the webpage shows:
+<ul>
+<li><i>Basic behavior statistic plot</i>: This plot shows a small subset of the behavior measurements for the line, plotted as the number of standard deviations from control. </li>
+<li><i>Registered expression image</i>: Max-projection image of the expression pattern. If no image is shown, it means we could not find a registered image of this line on the Fly Light webpage. </li>
+<li><i>Line behavior results link</i>: Link to the webpage describing the behavioral effects of neural activation for the GAL4 line.</li>
+<li><i>Fly Light imagery link</i>: Link to the webpage describing the expression pattern for the GAL4 line. </li>
+<li><i>Per-video behavior results</i>: Link to the results video clip and plots describing the behavior of the flies in each video of the GAL4 line. </li>
+<li><i>Per-sample expression patterns</i>: Links to all images we could find of the expression pattern of the GAL4 line. </li>
+</ul>
+
+<hr class="h2-divider">
+
+<h2><a id="ClusterMap">Clustering a Behavior-Anatomy Map</a></h2>
+
+<center>
+<a href="images/Screenshot_Cluster.png"><img src="images/Screenshot_Cluster.png" width="500px"></a>
+</center>
+
+<p>One can cluster the supervoxels that are significantly correlated with the current behavior by selecting <b>Cluster supervoxels</b> under the <b>Analyze</b> menu. The supervoxels are clustered based on their expression patterns. Instead of looking at expression across all GAL4 lines, we cluster based on expression across a subset of the GAL4 lines &mdash; those with a high enough value of the selected behavior index and those with a high enough expression level in some correlated supervoxel(s). </p>
+<p>The clustering will be shown in the main axes, with each cluster shown in a different color. In max-projection modes, we try to show smaller clusters above larger ones. When showing a clustering, all methods of <a href="#ExploreSupervoxel">Exploring a supervoxel</a> are applied to the clicked cluster instead. </p>
+<p>There are several parameters associated with the clustering, all of which can be adjusted in the panel at the bottom-right of the GUI when a clustering is shown:
+<ul>
+<li><i>Number of clusters</i>: How many clusters to form. </li>
+<li><i>Min. behavior index</i>: Threshold on behavior index to use when selecting lines for computing the expression-pattern-based distance between supervoxels. </li>
+<li><i>Min. expression</i>: Threshold on the expression level within some correlated supervoxel to use when selecting lines for computing the expression-pattern-based distance between supervoxels. </li>
+<li><i>Max. p-value</i>: Threshold on p-value for defining which supervoxels are correlated with the current behavior.</i>
+</ul>
+To affect the current clustering after changing the parameters, press the <b>Update</b> button. To stop showing the clustering and return to the behavior-anatomy map, click the <b>X</b> labeled <b>Showing clustering</b>.</p>
+
+<hr class="h2-divider">
+
+<h2><a id="ShowCorrelatedBehaviors">Showing Correlated Behaviors</a></h2>
+
+<center>
+<a href="images/Screenshot_CorrelatedBehaviors.png"><img src="images/Screenshot_CorrelatedBehaviors.png" width="500px"></a>
+</center>
+
+<p>Selecting <b>Show behaviors correlated w/ ???</b> from the <b>Analyze</b> menu results in a plot of behavior statistics that are most positively and most negatively correlated with the currently selected behavior statistics. </p>
+
+<hr class="h2-divider">
+
+<h2><a id="ExportingResults">Exporting Results</a></h2>
+
+<p>The current map can be exported to an image and/or to a .mat file using the options under the <b>File->Export</b> menu. </p>
+<p>When <b>exporting an image</b>, the type of image saved is dependent on the current <a href="#ViewMode">View Mode</a>. In max-projection modes, a <b>.png</b> file containing the max-projection of the mapis saved. In slice modes, a <b>.tiff</b> file containing the entire map image stack is saved. </p>
+<p><b>Exporting data</b> saves a <b>.mat</b> file containing a number of variables. Some of the important variables stored in this mat file are:
+<ul>
+<li><i>behaviorstring</i>: Selected behavior index.</li>
+<li><i>bamap.behaviormap</i>: 3-d array with the p-value associated with each voxel.</li>
+<li><i>bamap.supervoxeldata</i>: nlines x nsupervoxels matrix describing the expression pattern for all lines.</li>
+<li><i>bamap.baindex</i>: nsupervoxels x 1 array containing the correlation between the selected behavior statistic and expression level across lines for each suprevoxel.</li>
+<li><i>bamap.pvalue</i>: nsupervoxels x 1 array containing the p-value of the correlation test for each supervoxel.</li>
+<li><i>bamap.qvalue</i>: nsupervoxels x 1 array containing the FDR q-value of the correlation test for each supervoxel.</li>
+<li><i>bamap.pvalue_fdr</i>: nsupervoxels x 1 array, same as bamap.pvalue, except with supervoxels with a FDR > the specified threshold set to 1.</li>
+<li><i>bamap.normbehaviordata</i>: nlines x 1 array containing the behavior index for each line. </li>
+<li><i>bamap.clusterres</i>: Information about the last clustering of the significant supervoxels. </li>
+<li><i>bamap.clustermap</i>: 3-d array with cluster identities for each voxel.</li>
+
+<hr class="h2-divider">
+
+<h2><a id="Parameters">Parameters</a></h2>
+
+<center>
+<a href="images/Screenshot_Parameters.png"><img src="images/Screenshot_Parameters.png" width="300px"></a>
+</center>
+<p>Parameters of the visualization and algorithm can be modified using the dialog from the <b>Edit->Parameters...</b> menu item. The parameters are described above, and are summarized here as well:
+<ul>
+<li><a href="#BehaviorAnatomyCorrelation"><b>P-value map computation</b></a>: Parameters for computing the behavior-anatomy maps.
+<ul>
+<li><i>Number of samples</i>: Number of shuffled samples used in each behavior-anatomy correlation hypothesis test. The larger the value, the more precise but the slower the computation will be.</li>
+<li><i>False discovery rate</i>: Threshold on the <a href="https://en.wikipedia.org/wiki/False_discovery_rate">Benjamini-Hochberg false discovery rate</a> above which we suppress (by setting the reported p-value to 1) behavior anatomy correlations.</li>
+</ul>
+</li>
+<li><a href="#PValueColormap"><b>P-value colormapping</b></a>: Parameters for displaying the behavior-anatomy maps. 
+<ul>
+<li><i>Colormap interpolation</i>: Whether to use a log scaling or a linear scaling of the p-values when selecting colors. </li>
+<li><i>Min. p-value</i>: All supervoxels with p-values at or below this value will be colored dark red.</li>
+<li><i>Max. p-value</i>: All supervoxels with p-values at or above this value will be colored black. Max. and min. p-values define the limits of the colormap.</li>
+</ul>
+</li>
+<li><a href="#ShowImportantLines"><b>Show important lines for a cluster/supervoxel</b></a>: Parameters dictating how many lines to show when <i>Show important lines</i> is selected from the supervoxel drop-down menu.
+<ul>
+<li><i>Frac. behavior/anatomy index to explain</i>: Fraction of the totalled behavior-anatomy-product indices that should be accounted for by the selected lines.</li>
+<li><i>Max. num. lines to show</i>: Upper limit on the number of lines to show.</li>
+</ul>
+</li>
+<li><a href="#ShowANotBLines"><b>Show lines with anatomy expression but not behavior</b></a>: Parameters dictating which lines to show when <i>Show lines with expression but not behavior</i> is selected from the supervoxel drop-down menu.
+<ul>
+<li><i>Num. lines to show</i>: Maximum number of lines to select.</li>
+<li><i>Min. anatomy index</i>: For lines selected, minimum expression level in the selected supervoxel.</li>
+<li><i>Max. behavior index</i>: For lines selected, maximum value of the current behavior index.</li>
+</ul>
+</li>
+</ul>
+
+<hr class="h2-divider">
+
+<h2><a id="FindSupervoxel">Finding a Supervoxel</a></h2>
+
+<center>
+<a href="images/Screenshot_FindSupervoxel.png"><img src="images/Screenshot_FindSupervoxel.png" width="500px"></a>
+</center>
+
+<p>If you know the numerical identifier of a supervoxel of interest (given in the <i>Supervoxel ID</i> field of the <a href="#SupervoxelInfo">Current Supervoxel Information Panel</a>), you can locate that supevoxel using the <b>Edit->Find supervoxel</b> menu item. After you enter the supervoxel identifier, it will outline the maximum projection of the specified supervoxel in white. If the specified supervoxel is not visible in the current view of the map (e.g. if it is not part of the max projection, or if it is not visible in the current slice), the GUI will ask if you want to switch to a slice view so that it can display the selected supervoxel.</p>
+
+
+<footer>
+<hr class="h1-divider">
+<center>
+<a href="index.html">BABAM Documentation Home</a> | <a href="http://research.janelia.org/bransonlab/FlyBowl/BehaviorResults/index.html">Fly Bowl Home</a> | <a href="https://www.janelia.org/lab/branson-lab">Branson Lab</a> | <i>Last Updated Aug 8, 2016</i>
+</center>
+</footer>
+
+</body>
