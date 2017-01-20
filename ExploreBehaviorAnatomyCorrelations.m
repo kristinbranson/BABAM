@@ -240,7 +240,7 @@ fprintf('Data locations used:\n');
 fprintf('Mat file containing normalized behavior data: %s\n',EBAC_DATA.datafilename);
 fprintf('Supervoxel clustering data mat file: %s\n',EBAC_DATA.supervoxelfilename);
 if isempty(EBAC_DATA.anatomydir),
-  fprintf('No per-line anatomy image directory.\n');
+  fprintf('No per-line anatomy image directory. Anatomy images will be downloaded from the web.\n');
 else
   fprintf('Per-line anatomy image directory: %s\n',EBAC_DATA.anatomydir);
 end
