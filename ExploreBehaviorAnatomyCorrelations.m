@@ -74,6 +74,12 @@ guidata(hObject, handles);
 
 function handles = InitializeParameters(handles,varargin)
 
+[handles.isanatomydir,leftovers] = myparse_nocheck(varargin,'isanatomydir',[]);
+disp(varargin(:));
+
+if ischar(handles.isanatomydir),
+  handles.isanatomydir = str2double(handles.isanatomydir);
+end
 handles.dologcmap = true;
 handles.minpvalue_log = .0001;
 handles.maxpvalue = .051;
@@ -101,7 +107,7 @@ handles.nslices = 3;
 global EBAC_DATA;
 
 EBAC_DATA = BehaviorAnatomyCorrData('SetStatusFcn',@(varargin) SetStatusCallback(handles.figure1,varargin{:}),...
-  'ClearStatusFcn',@(varargin) ClearStatusCallback(handles.figure1,varargin{:}),varargin{:});
+  'ClearStatusFcn',@(varargin) ClearStatusCallback(handles.figure1,varargin{:}),leftovers{:});
 
 if isunix,
   handles.rcfile = getenv('HOME');
@@ -195,7 +201,10 @@ if ~exist(EBAC_DATA.supervoxelfilename,'file'),
   return;
 end
 
-if ~exist(EBAC_DATA.anatomydir,'dir'),
+if ~isempty(handles.isanatomydir) && (handles.isanatomydir == 0),
+  EBAC_DATA.anatomydir = '';
+  fprintf('No access to per-line anatomy image directory.\n');
+elseif ~exist(EBAC_DATA.anatomydir,'dir'),
   res = questdlg('Do you have access to the per-line anatomy image directory?');
   if strcmpi(res,'yes'),
     fprintf('Select per-line anatomy image directory. Example: AverageAnatomyData20141028...\n');
