@@ -130,7 +130,7 @@ classdef BehaviorAnatomyCorrData < matlab.mixin.Copyable
       
       if isempty(obj.labeldata),
         obj.SetStatusFcn('Loading anatomy data...');
-        obj.labeldata = load(obj.bamap.matfile,'labels','maskdata');
+        obj.labeldata = load(obj.bamap.matfile,'labels','maskdata','coloring');
         obj.labeldata.labels = permute(obj.labeldata.labels,[2,1,3]);
         obj.ClearStatusFcn();
       end
