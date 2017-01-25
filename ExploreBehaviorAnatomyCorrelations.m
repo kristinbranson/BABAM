@@ -993,6 +993,7 @@ if ismember('cluster',cleartypes),
   EBAC_DATA.bamap.clustermap = [];
 end
 set(handles.uipanel_cluster,'Visible','off');
+set(handles.uipanel_supervoxel,'Visible','on');
 
 function ClearStatus(handles)
 
@@ -1250,8 +1251,10 @@ set(handles.htitle,'String',handles.behaviorstring);
 
 if strcmp(handles.datatype,'cluster'),
   set(handles.uipanel_cluster,'Visible','on');
+  set(handles.uipanel_supervoxel,'Visible','off');
 else
   set(handles.uipanel_cluster,'Visible','off');
+  set(handles.uipanel_supervoxel,'Visible','on');
 end
 if strcmp(handles.datatype,'exprcorr'),
   set(handles.text_map_expr_corr,'Visible','on');
@@ -2311,6 +2314,7 @@ function menu_analyze_clustersv_Callback(hObject, eventdata, handles)
 handles.datatype = 'cluster';
 handles = ClusterSupervoxels(handles);
 set(handles.uipanel_cluster,'Visible','on');
+set(handles.uipanel_supervoxel,'Visible','off');
 guidata(hObject,handles);
 
 
@@ -2324,6 +2328,7 @@ handles.datatype = 'pvalue';
 handles.svmaskid = -1;
 
 set(handles.uipanel_cluster,'Visible','off');
+set(handles.uipanel_supervoxel,'Visible','on');
 
 handles = UpdateMap(handles);
 handles = UpdateMaskBoundary(handles);
