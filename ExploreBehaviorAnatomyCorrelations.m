@@ -74,6 +74,11 @@ guidata(hObject, handles);
 
 function handles = InitializeParameters(handles,varargin)
 
+[handles.isanatomydir,leftovers] = myparse_nocheck(varargin,'isanatomydir',[]);
+
+if ischar(handles.isanatomydir),
+  handles.isanatomydir = str2double(handles.isanatomydir);
+end
 handles.dologcmap = true;
 handles.minpvalue_log = .0001;
 handles.maxpvalue = .051;
@@ -101,7 +106,7 @@ handles.nslices = 3;
 global EBAC_DATA;
 
 EBAC_DATA = BehaviorAnatomyCorrData('SetStatusFcn',@(varargin) SetStatusCallback(handles.figure1,varargin{:}),...
-  'ClearStatusFcn',@(varargin) ClearStatusCallback(handles.figure1,varargin{:}),varargin{:});
+  'ClearStatusFcn',@(varargin) ClearStatusCallback(handles.figure1,varargin{:}),leftovers{:});
 
 if isunix,
   handles.rcfile = getenv('HOME');
@@ -210,7 +215,10 @@ if ~exist(EBAC_DATA.supervoxelfilename,'file'),
   return;
 end
 
-if ~exist(EBAC_DATA.anatomydir,'dir'),
+if ~isempty(handles.isanatomydir) && (handles.isanatomydir == 0),
+  EBAC_DATA.anatomydir = '';
+  fprintf('No access to per-line anatomy image directory.\n');
+elseif ~exist(EBAC_DATA.anatomydir,'dir'),  
   res = questdlg('Do you have access to the per-line anatomy image directory?');
   if strcmpi(res,'yes'),
     fprintf('Select per-line anatomy image directory. Example: AverageAnatomyData20141028...\n');
@@ -419,6 +427,8 @@ end
 
 SetLogicControlVisibility(handles);
 set(handles.text_map_expr_corr,'Visible','off');
+set(handles.text_showsupervoxelclustering,'Visible','off');
+set(handles.pushbutton_stop_showsupervoxelclustering,'Visible','off');
 
 handles = ClearState(handles,{'cluster','supervoxel'});
 
@@ -1089,6 +1099,8 @@ switch handles.viewmode,
         [maxproj,idx] = max(EBAC_DATA.bamap.exprcorrmap,[],3);
       case 'cluster',
         [maxproj,idx] = max(EBAC_DATA.bamap.clustermap,[],3);
+      case 'supervoxel',
+        error('This should never happen!');
     end
     
     idx2 = sub2ind([handles.ysz*handles.xsz,handles.zsz],1:handles.ysz*handles.xsz,idx(:)');
@@ -1109,6 +1121,8 @@ switch handles.viewmode,
         set(handles.him_map,'CData',EBAC_DATA.bamap.exprcorrmap(:,:,handles.zslice));
       case 'cluster'
         set(handles.him_map,'CData',EBAC_DATA.bamap.clustermap(:,:,handles.zslice));
+      case 'supervoxels',
+        set(handles.him_map,'CData',EBAC_DATA.labeldata.imcolor(:,:,handles.zslice));
     end
 
     supervoxelid = EBAC_DATA.labeldata.labels(:,:,handles.zslice);
@@ -1138,6 +1152,8 @@ switch handles.viewmode,
       case 'cluster',
         [maxsliceproj,handles.slice_z0s,handles.slice_z1s,idx] = SlicedMaxProjection(EBAC_DATA.bamap.clustermap,...
           handles.nslices,'fun','max','dir',3);
+      case 'supervoxels',
+        error('This should never happen!');
         %[maxproj,idx] = max(EBAC_DATA.bamap.clustermap,[],3);
     end
 
@@ -1176,6 +1192,8 @@ switch handles.viewmode,
         [maxproj,idx] = max(EBAC_DATA.bamap.exprcorrmap,[],1);
       case 'cluster',
         [maxproj,idx] = max(EBAC_DATA.bamap.clustermap,[],1);        
+      case 'supervoxels',
+        error('This should never happen!');
     end
         
     idx2 = sub2ind([handles.ysz,handles.xsz*handles.zsz],idx(:)',1:handles.xsz*handles.zsz);
@@ -1196,6 +1214,8 @@ switch handles.viewmode,
         set(handles.him_map,'CData',permute(EBAC_DATA.bamap.exprcorrmap(handles.yslice,:,:),[3,2,1]));
       case 'cluster',
         set(handles.him_map,'CData',permute(EBAC_DATA.bamap.clustermap(handles.yslice,:,:),[3,2,1]));
+      case 'supervoxels',
+        set(handles.him_map,'CData',permute(EBAC_DATA.labeldata.imcolor(handles.yslice,:,:),[3,2,1]));
     end
     supervoxelid = permute(EBAC_DATA.labeldata.labels(handles.yslice,:,:),[3,2,1]);
     compartmentid = permute(single(EBAC_DATA.labeldata.maskdata.mask(handles.yslice,:,:)),[3,2,1]);
@@ -1223,6 +1243,8 @@ switch handles.viewmode,
         [maxsliceproj,handles.slice_y0s,handles.slice_y1s,idx] = SlicedMaxProjection(EBAC_DATA.bamap.clustermap,...
           handles.nslices,'fun','max','dir',1);
         %[maxproj,idx] = max(EBAC_DATA.bamap.clustermap,[],3);
+      case 'supervoxels',
+        error('This should never happen!');
     end
     
     handles.slicez = repmat((1:handles.zsz)',[handles.nslices,1]);
@@ -1264,6 +1286,15 @@ else
   set(handles.pushbutton_stop_map_expr_corr,'Visible','off');
 end
  
+if strcmp(handles.datatype,'supervoxels'),
+  set(handles.text_showsupervoxelclustering,'Visible','on');
+  set(handles.pushbutton_stop_showsupervoxelclustering,'Visible','on');
+else
+  set(handles.text_showsupervoxelclustering,'Visible','off');
+  set(handles.pushbutton_stop_showsupervoxelclustering,'Visible','off');
+end
+
+
 function handles = UpdateView(handles)
 
 set(handles.menu_view_modes,'Checked','off');
@@ -1574,7 +1605,14 @@ switch handles.datatype,
     set(handles.hmaskboundary,'Color','w');
     set(handles.hsvboundary,'Color','w');
     
-end
+  case 'supervoxels'
+    ncolors = max(EBAC_DATA.labeldata.coloring);
+    clim = [0,ncolors];
+    cm = jet(ncolors);
+    cm = [0,0,0;cm(randperm(ncolors),:)];
+    set(handles.hmaskboundary,'Color','w');
+    set(handles.hsvboundary,'Color','w');
+    end
 set(handles.axes_main,'CLim',clim);
 colormap(handles.axes_main,cm);
 
@@ -2505,7 +2543,9 @@ else
 end
 
 fns = {'uipanel_behavior','uipanel_supervoxel','uipanel_cluster',...
-  'text_map_expr_corr','pushbutton_stop_map_expr_corr'};
+  'text_map_expr_corr','pushbutton_stop_map_expr_corr',...
+  'text_showsupervoxelclustering','pushbutton_stop_showsupervoxelclustering',...
+};
 
 for i = 1:numel(fns),
   fn = fns{i};
@@ -3379,3 +3419,73 @@ function edit_behavior_logicalexpr_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --------------------------------------------------------------------
+function menu_view_showsupervoxels_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_view_showsupervoxels (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% set view mode to slice
+if ismember(handles.viewmode,{'zslice','yslice'}),
+  % nothing to be done
+else
+  
+  res = questdlg('Need to switch to slice view mode to show supervoxels. Ok?');
+  if ~strcmpi(res,'Yes'),
+    return;
+  end  
+  if any(handles.viewmode == 'z'),
+    % switch to zslice
+    handles.viewmode = 'zslice';
+  else
+    % switch to yslice
+    handles.viewmode = 'yslice';
+  end
+  handles = UpdateView(handles);
+end
+
+global EBAC_DATA;
+
+if ~isfield(EBAC_DATA.labeldata,'imcolor'),
+
+  % compute correlation in expression between this supervoxel and all others
+  SetStatus(handles,'Computing colored version of supervoxel mapping...');
+    
+  EBAC_DATA.labeldata.imcolor = zeros([size(EBAC_DATA.labeldata.labels),3],'uint8');
+  EBAC_DATA.labeldata.imcolor(EBAC_DATA.labeldata.labels>0) = EBAC_DATA.labeldata.coloring(EBAC_DATA.labeldata.labels(EBAC_DATA.labeldata.labels>0));
+  
+end
+
+handles.datatype = 'supervoxels';
+
+set(handles.text_showsupervoxelclustering,'Visible','on');
+set(handles.pushbutton_stop_showsupervoxelclustering,'Visible','on');
+
+set([handles.menu_view_maxzprojection,handles.menu_view_maxzsliceprojection,...
+  handles.menu_view_maxyprojection,handles.menu_view_maxysliceprojection],...
+  'Enable','off');
+
+handles = UpdateMap(handles);
+handles = UpdateMaskBoundary(handles);
+handles = UpdateMapScaling(handles);
+ClearStatus(handles);
+guidata(hObject,handles);
+
+
+% --- Executes on button press in pushbutton_stop_showsupervoxelclustering.
+function pushbutton_stop_showsupervoxelclustering_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_stop_showsupervoxelclustering (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(handles.text_showsupervoxelclustering,'Visible','off');
+set(handles.pushbutton_stop_showsupervoxelclustering,'Visible','off');
+set(handles.menu_view_modes,'Enable','on');
+
+handles.datatype = 'pvalue';
+handles = UpdateMap(handles);
+handles = UpdateMaskBoundary(handles);
+handles = UpdateMapScaling(handles);
+guidata(hObject,handles);
