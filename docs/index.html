@@ -89,8 +89,8 @@ Compiled binaries and source code releases are available <a href="https://github
 BABAM is a MATLAB-based program. To run it:
 <ol>
 <li> Start MATLAB. </li>
-<li> Within MATLAB, change into the directory <b>FlyBowlAnalysis</b>:
-<pre>cd FlyBowlAnalysis;</pre>
+<li> Within MATLAB, change into the directory containing the BABAM code:
+<pre>cd BABAM;</pre>
 </li>
 <li> Run <b>StartBABAM</b> on the command line to start BABAM:
 <pre>StartBABAM;</pre>
@@ -107,7 +107,7 @@ BABAM will then try to locate the Fly Bowl behavior and expression data it needs
 </li>
 <li> <a href="images/ScreenShot_SelectSupervoxelDataMATFile.png"><b>Supervoxel Clustering Data MAT File</b></a>: MAT file containing the supervoxel clustering of the brain. This data can be downloaded at <a href="http://research.janelia.org/bransonlab/FlyBowl/BABAMMATFiles/current/SupervoxelClusteringData.mat">SupervoxelClusteringData.mat</a>. <br>
 </li>
-<li> <a href="images/ScreenShot_SelectAnatomyDir.png"><b>Per-line Anatomy Image Directory</b></a>: Directory containing normalized, registered images of the expression patterns for each brain. This data can be downloaded at <a href="http://research.janelia.org/bransonlab/FlyBowl/BABAMMATFiles/current/AverageAnatomyData.zip">AverageAnatomyData</a>.<br>
+<li> <a href="images/ScreenShot_SelectAnatomyDir.png"><b>Per-line Anatomy Image Directory</b></a>: Directory containing normalized, registered images of the expression patterns for each brain. This data can be downloaded at <a href="http://research.janelia.org/bransonlab/FlyBowl/BABAMMATFiles/current/AverageAnatomyData.zip">AverageAnatomyData</a>. This data is large, and BABAM can run without it. In this case, supervoxel-compressed representations of the per-line expression patterns will be shown. BABAM will ask whether this data is available at start-up. 
 </li>
 </ol>
 
@@ -362,10 +362,18 @@ To affect the current clustering after changing the parameters, press the <b>Upd
 <p>If you know the numerical identifier of a supervoxel of interest (given in the <i>Supervoxel ID</i> field of the <a href="#SupervoxelInfo">Current Supervoxel Information Panel</a>), you can locate that supevoxel using the <b>Edit->Find supervoxel</b> menu item. After you enter the supervoxel identifier, it will outline the maximum projection of the specified supervoxel in white. If the specified supervoxel is not visible in the current view of the map (e.g. if it is not part of the max projection, or if it is not visible in the current slice), the GUI will ask if you want to switch to a slice view so that it can display the selected supervoxel.</p>
 
 
+<h2><a id="">Exploring Supervoxel Clustering</a></h2>
+
+<center>
+<a href="images/Screenshot_ShowSupervoxelClsutering.png"><img src="images/Screenshot_ShowSupervoxelClustering.png" width="500px"></a>
+</center>
+
+<p>You can view the supervoxel-based clustering of the brain by selecting <b>Show supervoxel clustering</b> from the <b>View</b> menu.</p>
+
 <footer>
 <hr class="h1-divider">
 <center>
-<a href="index.html">BABAM Documentation Home</a> | <a href="http://research.janelia.org/bransonlab/FlyBowl/BehaviorResults/index.html">Fly Bowl Home</a> | <a href="https://www.janelia.org/lab/branson-lab">Branson Lab</a> | <i>Last Updated Aug 8, 2016</i>
+<a href="index.html">BABAM Documentation Home</a> | <a href="http://research.janelia.org/bransonlab/FlyBowl/BehaviorResults/index.html">Fly Bowl Home</a> | <a href="https://www.janelia.org/lab/branson-lab">Branson Lab</a> | <i>Last Updated June 5, 2017</i>
 </center>
 </footer>
 

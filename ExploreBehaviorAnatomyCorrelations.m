@@ -191,8 +191,14 @@ hObject = handles.figure1;
 
 % initialize all file locations
 if ~exist(EBAC_DATA.datafilename,'file'),
-  fprintf('Select mat file containing normalized behavior data. Example: ComputeBehaviorAnatomyMap_NormBehaviorData_20150825.mat...\n');
+  fprintf('Select mat file containing normalized behavior data. Example: BehaviorData.mat...\n');
+  if ismac,
+    hinfo = helpdlg('Select mat file containing normalized behavior data. Example: BehaviorData.mat','Select data file');
+  end
   [n,p] = uigetfile('*.mat','Select mat file containing normalized behavior data');
+  if ismac && ishandle(hinfo),
+    delete(hinfo);
+  end
   if ~ischar(n),
     delete(hObject);
     return;
@@ -201,8 +207,14 @@ if ~exist(EBAC_DATA.datafilename,'file'),
 end
 
 if ~exist(EBAC_DATA.supervoxelfilename,'file'),
-  fprintf('Select supervoxel clustering data mat file. Example: ComputeBehaviorAnatomyMapData_ms_centers0.750000_w0.000010_r2_20150202.mat...\n');
+  fprintf('Select supervoxel clustering data mat file. Example: SupervoxelClusteringData.mat...\n');
+  if ismac,
+    hinfo = helpdlg('Select supervoxel clustering data mat file. Example: SupervoxelClusteringData.mat','Select data file');
+  end
   [n,p] = uigetfile('*.mat','Supervoxel clustering data mat file',fileparts(EBAC_DATA.datafilename));
+  if ismac && ishandle(hinfo),
+    delete(hinfo);
+  end
   if ~ischar(n),
     delete(hObject);
     return;
@@ -222,7 +234,13 @@ elseif ~exist(EBAC_DATA.anatomydir,'dir'),
   res = questdlg('Do you have access to the per-line anatomy image directory?');
   if strcmpi(res,'yes'),
     fprintf('Select per-line anatomy image directory. Example: AverageAnatomyData20141028...\n');
+    if ismac,
+      hinfo = helpdlg('Select per-line anatomy image directory. Example: AverageAnatomyData20141028','Select data file');
+    end
     EBAC_DATA.anatomydir = uigetdir('','Per-line anatomy image directory');
+    if ismac && ishandle(hinfo),
+      delete(hinfo);
+    end
     if ~ischar(EBAC_DATA.anatomydir) || ~exist(EBAC_DATA.anatomydir,'dir')
       delete(hObject);
       return;
