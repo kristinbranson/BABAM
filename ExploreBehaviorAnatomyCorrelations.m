@@ -22,7 +22,7 @@ function varargout = ExploreBehaviorAnatomyCorrelations(varargin)
 
 % Edit the above text to modify the response to help ExploreBehaviorAnatomyCorrelations
 
-% Last Modified by GUIDE v2.5 12-May-2016 13:31:11
+% Last Modified by GUIDE v2.5 17-May-2023 14:40:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,7 @@ function ExploreBehaviorAnatomyCorrelations_OpeningFcn(hObject, eventdata, handl
 
 % Choose default command line output for ExploreBehaviorAnatomyCorrelations
 handles.output = hObject;
+set(handles.FigureToolBar,'Visible','off');
 
 handles = DisableInteraction(handles);
 
@@ -1087,6 +1088,15 @@ if ~isinit,
   handles.hmaskboundary = plot(handles.axes_main,nan,nan,'w-','HitTest','off');
   handles.hsvboundary = plot(handles.axes_main,nan,nan,'w-','HitTest','off');
   handles.htitle = title(handles.axes_main,handles.behaviorstring,'Interpreter','none');
+  handles.hcolorbar = colorbar(handles.axes_main);
+  set(handles.hcolorbar,'Color',[.99,.99,.99]);
+  set(handles.hcolorbar.Label,'Color',[.99,.99,.99]);
+  set(handles.hcolorbar,'Position',[.925,.7,.025,.25]);
+  % I don't like the axes toolbar 
+  try %#ok<TRYNC>
+    ht = get(handles.axes_main,'Toolbar');
+    set(ht,'Visible','off');
+  end
   
   handles = UpdateMaskBoundary(handles);
   handles = UpdateMapScaling(handles);
@@ -1594,19 +1604,36 @@ function handles = UpdateMapScaling(handles)
 
 global EBAC_DATA;
 
+colorbarticksmode = 'auto';
 switch handles.datatype,
   
   case 'pvalue',
-    
+    % TODO: do something with these: colorbar?
+    pvalueslabel = handles.pvalueslabel;
+    pvaluelabels = handles.pvaluelabels;
+    idxremove = pvalueslabel < handles.minpvalue | pvalueslabel > handles.maxpvalue;
+    pvalueslabel(idxremove) = [];
+    pvaluelabels(idxremove) = [];
+    if isempty(pvaluelabels),
+      pvaluelabels = strtrim(cellstr(num2str(pvalueslabel(:))));
+      pvaluelabels = regexprep(pvaluelabels,'^0.','.');
+    end
+
     if handles.dologcmap,
       clim = [0,log10(handles.maxpvalue)-log10(handles.minpvalue)];
       cm = kjet(256);
+      colorbarticks = log10(handles.maxpvalue)-log10(pvalueslabel);
+      colorbarticks = fliplr(colorbarticks);
+      colorbarticklabels = fliplr(pvaluelabels);
     else
       clim = [handles.minpvalue,handles.maxpvalue];
       cm = flipud(kjet(256));
+      colorbarticks = pvalueslabel;
+      colorbarticklabels = pvaluelabels;
     end
     set(handles.hmaskboundary,'Color','w');
     set(handles.hsvboundary,'Color','w');
+    colorbarticksmode = 'manual';
     
   case 'exprcorr',
 
@@ -1633,18 +1660,11 @@ switch handles.datatype,
     end
 set(handles.axes_main,'CLim',clim);
 colormap(handles.axes_main,cm);
-
-% TODO: do something with these: colorbar?
-pvalueslabel = handles.pvalueslabel;
-pvaluelabels = handles.pvaluelabels;
-idxremove = pvalueslabel < handles.minpvalue | pvalueslabel > handles.maxpvalue;
-pvalueslabel(idxremove) = [];
-pvaluelabels(idxremove) = [];
-if isempty(pvaluelabels),
-  pvaluelabels = strtrim(cellstr(num2str(pvalueslabel(:))));
-  pvaluelabels = regexprep(pvaluelabels,'^0.','.');
+if strcmp(colorbarticksmode,'auto'),
+  set(handles.hcolorbar,'TicksMode','auto','TickLabelsMode','auto');
+else
+  set(handles.hcolorbar,'Ticks',colorbarticks,'TickLabels',colorbarticklabels);
 end
-
 
 % --------------------------------------------------------------------
 function menu_file_Callback(hObject, eventdata, handles)
@@ -3507,3 +3527,38 @@ handles = UpdateMap(handles);
 handles = UpdateMaskBoundary(handles);
 handles = UpdateMapScaling(handles);
 guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function uipushtool_save_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to uipushtool_save (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+ExportMapPlot(handles);
+
+function ExportMapPlot(handles)
+
+persistent savefile;
+persistent savefiletype;
+if isempty(savefile),
+  savefile = '';
+end
+if isempty(savefiletype),
+  savefiletype = 'png';
+end
+savefiletypes = {'*.jpg;*.png;*.tiff;*.eps;*.pdf';'*.*'};
+[f,p] = uiputfile(savefiletypes,'Export map plot',savefile);
+if ~ischar(f),
+  return;
+end
+savefile = fullfile(p,f);
+exportgraphics(handles.axes_main,savefile,'BackgroundColor','k');
+fprintf('Exported plot to %s\n',savefile);
+
+% --------------------------------------------------------------------
+function menu_export_map_plot_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_export_map_plot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+ExportMapPlot(handles);
