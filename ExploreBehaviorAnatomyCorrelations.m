@@ -370,7 +370,7 @@ end
 
 % get initial sizes of stuff
 handles.sizeinfo = struct;
-hs = findall(handles.figure1,'-property','Position');
+hs = findobj(handles.figure1,'-property','Position');
 for i = 1:numel(hs),
   fn = get(hs(i),'Tag');
   if isempty(fn),
