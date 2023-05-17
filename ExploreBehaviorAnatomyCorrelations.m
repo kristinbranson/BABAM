@@ -1657,13 +1657,19 @@ switch handles.datatype,
     cm = [0,0,0;cm(randperm(ncolors),:)];
     set(handles.hmaskboundary,'Color','w');
     set(handles.hsvboundary,'Color','w');
-    end
+end
+
 set(handles.axes_main,'CLim',clim);
 colormap(handles.axes_main,cm);
-if strcmp(colorbarticksmode,'auto'),
-  set(handles.hcolorbar,'TicksMode','auto','TickLabelsMode','auto');
+if ismember(handles.datatype,{'cluster','supervoxels'}),
+  set(handles.hcolorbar,'Visible','off');
 else
-  set(handles.hcolorbar,'Ticks',colorbarticks,'TickLabels',colorbarticklabels);
+  set(handles.hcolorbar,'Visible','on');
+  if strcmp(colorbarticksmode,'auto'),
+    set(handles.hcolorbar,'TicksMode','auto','TickLabelsMode','auto');
+  else
+    set(handles.hcolorbar,'Ticks',colorbarticks,'TickLabels',colorbarticklabels);
+  end
 end
 
 % --------------------------------------------------------------------
